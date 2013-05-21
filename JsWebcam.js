@@ -1,8 +1,7 @@
 define(['jquery','underscore','promise'], function(jquery, underscore, promise) {
 	function JsWebcam() {
-		this.$container.append(this.video);
-		this.video.height = this.$container.height();
-		this.video.width = this.$container.width();
+		this.video.width = 640;
+		this.video.height = 480;
 	}
 
 	var getUserMedia = navigator[_.detect(['getUserMedia','webkitGetUserMedia'], function(key) {
@@ -44,7 +43,6 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 		screenshot: function() {
 			var img = new Image();
-			this.video.pause();
 			this.canvas.width = this.video.width;
 			this.canvas.height = this.video.height;
 			this.canvas.getContext('2d').drawImage(this.video, 0, 0);
