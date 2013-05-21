@@ -1,0 +1,35 @@
+<html>
+	<head>
+		<title>Webcam</title>
+		<script src="http://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
+	</head>
+	<body>
+		<div id="webcam-feed" style="width:500px; height:500px;"></div>
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.5/require.min.js"></script>
+		<script>
+			requirejs.config({
+				paths: {
+					lib: '../js-libs',
+					underscore: 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min',
+					jquery: 'http://cdnjs.cloudflare.com/ajax/libs/require-jquery/0.25.0/require-jquery.min',
+					promise: 'http://cdnjs.cloudflare.com/ajax/libs/q.js/0.9.2/q'
+				}
+			});
+			require(['./JsWebcam'], function(JsWebcam) {
+				function TestWebcam() {
+					JsWebcam.call(this);
+				}
+
+				function A() { }
+				A.prototype = JsWebcam.prototype;
+				TestWebcam.prototype = new A();
+				TestWebcam.prototype.constructor = TestWebcam;
+
+				TestWebcam.prototype.$container = $('#webcam-feed');
+
+				var w = new TestWebcam();
+				w.picture().then(function(img) { document.body.appendChild(img); });
+			});
+		</script>
+	</body>
+</html>
