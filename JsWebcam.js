@@ -26,14 +26,12 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		},
 
 		play: function() {
-			this.requestWebcam()
+			return this.requestWebcam()
 				.then(_.bind(this.setVideoStream, this))
 				.then(_.bind(function() {
 					this.video.play();
 					this.isPlaying = true;
-				}, this), function(e) {
-					console.log(e);
-				});
+				}, this));
 		},
 
 		stop: function() {
@@ -61,7 +59,7 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 					df.resolve(this.screenshot());
 					this.stop();
 				}, this));
-				this.play();
+				this.play().fail(_.bind(df.reject, df));
 			}
 			return df.promise;
 		}
