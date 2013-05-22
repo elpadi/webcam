@@ -4,9 +4,13 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		this.video.height = 480;
 	}
 
-	var getUserMedia = navigator[_.detect(['getUserMedia','webkitGetUserMedia'], function(key) {
+	var userMediaKey = _.detect(['getUserMedia','webkitGetUserMedia','mozGetUserMedia','msGetUserMedia'], function(key) {
 		return key in navigator;
-	})].bind(navigator);
+	});
+	var getUserMedia = userMediaKey ? navigator[userMediaKey].bind(navigator) : function() {};
+	var URL = window[_.detect(['URL','webkitURL','msURL'], function(key) {
+		return key in window;
+	})];
 
 	JsWebcam.prototype = {
 
@@ -22,7 +26,12 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		},
 
 		setVideoStream: function(stream) {
-			this.video.src = window.URL.createObjectURL(stream);
+			if (this.video.mozSrcObject !== undefined) {
+				this.video.mozSrcObject = stream;
+			}
+			else {
+				this.video.src = URL.createObjectURL(stream);
+			}
 		},
 
 		play: function() {
@@ -55,9 +64,11 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 				df.resolve(this.screenshot());
 			}
 			else {
-				$(this.video).one('timeupdate', _.bind(function() {
-					df.resolve(this.screenshot());
-					this.stop();
+				$(this.video).one('timeupdate', _.bind(function(e) {
+					setTimeout(_.bind(function() {
+						df.resolve(this.screenshot());
+						this.stop();
+					}, this), 1000);
 				}, this));
 				this.play().fail(_.bind(df.reject, df));
 			}

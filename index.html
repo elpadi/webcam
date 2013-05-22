@@ -28,6 +28,8 @@
 				TestWebcam.prototype.$container = $('#webcam-feed');
 
 				var w = new TestWebcam();
+				document.body.appendChild(w.video);
+				document.body.appendChild(w.canvas);
 				w.picture().then(function(img) { document.body.appendChild(img); });
 			});
 		</script>
