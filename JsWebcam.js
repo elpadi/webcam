@@ -1,7 +1,6 @@
 define(['jquery','underscore','promise'], function(jquery, underscore, promise) {
 	function JsWebcam() {
-		this.video.width = 640;
-		this.video.height = 480;
+		this.options = { video: true };
 	}
 
 	var userMediaKey = _.detect(['getUserMedia','webkitGetUserMedia','mozGetUserMedia','msGetUserMedia'], function(key) {
@@ -17,12 +16,10 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		$container: null,
 		video: document.createElement('video'),
 		canvas: document.createElement('canvas'),
-		isPlaying: false,
+		options: null,
 		
-		requestWebcam: function() {
-			var df = promise.defer();
-			getUserMedia({ video: true }, _.bind(df.resolve, df), _.bind(df.reject, df));
-			return df.promise;
+		requestWebcam: function(df) {
+			getUserMedia(this.options, _.bind(df.resolve, df), _.bind(df.reject, df));
 		},
 
 		setVideoStream: function(stream) {
@@ -32,15 +29,6 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			else {
 				this.video.src = URL.createObjectURL(stream);
 			}
-		},
-
-		play: function() {
-			return this.requestWebcam()
-				.then(_.bind(this.setVideoStream, this))
-				.then(_.bind(function() {
-					this.video.play();
-					this.isPlaying = true;
-				}, this));
 		},
 
 		stop: function() {
@@ -53,26 +41,29 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			this.canvas.width = this.video.width;
 			this.canvas.height = this.video.height;
 			this.canvas.getContext('2d').drawImage(this.video, 0, 0);
-			this.video.play();
 			img.src = this.canvas.toDataURL('image/png');
 			return img;
 		},
 
-		picture: function() {
-			var df = promise.defer();
-			if (this.isPlaying) {
-				df.resolve(this.screenshot());
-			}
-			else {
-				$(this.video).one('timeupdate', _.bind(function(e) {
-					setTimeout(_.bind(function() {
-						df.resolve(this.screenshot());
-						this.stop();
-					}, this), 1000);
-				}, this));
-				this.play().fail(_.bind(df.reject, df));
-			}
-			return df.promise;
+		picture: function(df) {
+			var triesLeft = 3;
+			var image;
+			var screenshot = _.bind(function() {
+				try {
+					image = this.screenshot();
+					df.resolve(image);
+				}
+				catch (e) {
+					triesLeft--;
+					if (triesLeft > 0) {
+						setTimeout(screenshot, 5000);
+					}
+					else {
+						df.reject(e);
+					}
+				}
+			}, this);
+			setTimeout(screenshot, 1000);
 		}
 	};
 
