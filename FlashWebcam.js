@@ -1,6 +1,10 @@
 define(['jquery','underscore','promise','getUserMedia'], function(jquery, underscore, promise, getUserMedia) {
 
 	function FlashWebcam() {
+		this.flash.$container = $(document.createElement('div')).attr({
+			id: 'webcam-flash-container',
+			class: 'invisible'
+		}).prependTo(this.$container.children().first().css('overflow','hidden'));
 		this.options = {
 			width: this.$container.width(),
 			height: this.$container.height(),
@@ -10,14 +14,10 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 			debug: _.bind(this.onFlashInfo, this),
 			onCapture: _.bind(this.onFlashCapture, this),
 			onSave: _.bind(this.onCaputreStream, this),
-			el: 'webcam-flash-container',
+			el: this.flash.$container.attr('id'),
 			append: true,
 			context: 'flash' // webrtc for js. filled by shim
 		};
-		this.flash.$container = $(document.createElement('div')).attr({
-			id: 'webcam-flash-container',
-			className: 'visibility--invisible'
-		}).appendTo(this.$container);
 	}
 
 	FlashWebcam.prototype.flash = {
@@ -47,7 +47,7 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 		else {
 			window.getUserMedia(this.options);
 		}
-		this.flash.$container.visible();
+		this.flash.$container.removeClass('invisible');
 	};
 
 	FlashWebcam.prototype.stop = function() {
@@ -55,7 +55,7 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 	};
 
 	FlashWebcam.prototype.takePicture = function(df) {
-		this.flash.$container.invisibleImmediate();
+		this.flash.$container.addClass('invisible');
 		this.flash.deferreds.screenshot = df;
 		setTimeout(function() { window.webcam.capture(); }, 2000);
 	};
