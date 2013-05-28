@@ -13,27 +13,39 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 	JsWebcam.prototype = {
 
-		$container: null,
 		video: document.createElement('video'),
-		canvas: document.createElement('canvas'),
-		options: null,
+		stream: null,
 		
+		setDimensions: function(width, height) {
+			this.video.width = width;
+			this.video.height = height;
+		},
+
 		requestWebcam: function(df) {
 			getUserMedia(this.options, _.bind(df.resolve, df), _.bind(df.reject, df));
+			df.promise.then(_.bind(this.setVideoStream, this));
 		},
 
 		setVideoStream: function(stream) {
+			this.stream = stream;
 			if (this.video.mozSrcObject !== undefined) {
-				this.video.mozSrcObject = stream;
+				this.video.mozSrcObject = this.stream;
 			}
 			else {
-				this.video.src = URL.createObjectURL(stream);
+				this.video.src = URL.createObjectURL(this.stream);
 			}
 		},
 
 		stop: function() {
 			this.video.pause();
+			this.stream && this.stream.stop();
 			this.video.removeAttribute('src');
+			if (this.video.mozSrcObject !== undefined) {
+				this.video.mozSrcObject && delete this.video.mozSrcObject;
+			}
+			else {
+				this.stream && URL.revokeObjectURL(this.stream);
+			}
 		},
 
 		screenshot: function() {
@@ -45,7 +57,7 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			return img;
 		},
 
-		picture: function(df) {
+		takePicture: function(df) {
 			var triesLeft = 3;
 			var image;
 			var screenshot = _.bind(function() {
@@ -63,6 +75,7 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 					}
 				}
 			}, this);
+			this.video.play();
 			setTimeout(screenshot, 1000);
 		}
 	};
