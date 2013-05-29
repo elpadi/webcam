@@ -51,7 +51,7 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 	};
 
 	FlashWebcam.prototype.stop = function() {
-		this.flash.$container.empty();
+		this.flash.$container.empty().addClass('invisible');
 	};
 
 	FlashWebcam.prototype.takePicture = function(df) {
@@ -63,6 +63,7 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 	FlashWebcam.prototype.onFlashInfo = function(type, value) {
 		switch (value) {
 			case "Camera stopped":
+			case "No camera was detected.":
 				this.flash.deferreds.request.reject();
 				break;
 			case "Camera started":
