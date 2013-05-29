@@ -2,9 +2,8 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 	function IosWebcam() {
 		this.ios.$container = $(document.createElement('form')).attr({
-			id: 'webcam-ios-container',
-			class: 'visibility--invisible'
-		}).appendTo(this.$container.children().first());;
+			id: 'webcam-ios-container'
+		}).addClass('visibility--invisible').appendTo(this.$container.children().first());;
 		this.ios.$input = $('<input id="webcam-input" type="file" accept="image/*;capture=camera">')
 			.on('change', _.bind(this.onPictureUpload, this))
 			.appendTo(this.ios.$container);

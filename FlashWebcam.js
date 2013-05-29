@@ -2,9 +2,9 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 
 	function FlashWebcam() {
 		this.flash.$container = $(document.createElement('div')).attr({
-			id: 'webcam-flash-container',
-			class: 'invisible'
-		}).prependTo(this.$container.children().first().css('overflow','hidden'));
+			id: 'webcam-flash-container'
+		}).addClass('invisible')
+			.prependTo(this.$container.children().first().css('overflow','hidden'));
 		this.options = {
 			width: this.$container.width(),
 			height: this.$container.height(),
