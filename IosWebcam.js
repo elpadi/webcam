@@ -32,11 +32,33 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		this.ios.$container.visibleImmediate();
 	};
 
+	IosWebcam.prototype.preprocessScreenshot = function(img) {
+		var l = Math.min(720, img.width, img.height),
+			ar = img.width / img.height,
+			i = new Image(),
+			c = document.createElement('canvas'),
+			scale,
+			ctx = c.getContext('2d');
+
+		console.group('IosWebcam.preprocessScreenshot');
+		console.log('img width:', img.width, 'img height:', img.height, 'img ratio:', ar);
+		c.width = l
+		c.height = l
+		scale = c.width / img.width;
+		console.log('c.width:', c.width, 'c.height:', c.height, 'scale:', scale);
+		console.groupEnd();
+		ctx.drawImage(img, 0, 0, l, l, 0, 0, l, l);
+		i.src = c.toDataURL();
+		return i;
+	};
+
 	IosWebcam.prototype.takePicture = function(df) {
-		var reader = new FileReader();
+		var reader = new FileReader(), that = this;
 		reader.onload = function(e) {
 			var img = new Image();
-			img.onload = _.bind(df.resolve, df, img);
+			img.onload = function() {
+				df.resolve(that.preprocessScreenshot(img));
+			};
 			img.src = e.target.result;
 		};
 		reader.readAsDataURL(this.ios.$input[0].files[0]);
