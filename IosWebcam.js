@@ -42,12 +42,12 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 		console.group('IosWebcam.preprocessScreenshot');
 		console.log('img width:', img.width, 'img height:', img.height, 'img ratio:', ar);
-		c.width = l
-		c.height = l
+		c.width = 720;
+		c.height = 720;
 		scale = c.width / img.width;
 		console.log('c.width:', c.width, 'c.height:', c.height, 'scale:', scale);
 		console.groupEnd();
-		ctx.drawImage(img, 0, 0, l, l, 0, 0, l, l);
+		ctx.drawImage(img, (img.width - l) / 2, (img.height - l) / 2, l, l, 0, 0, 720, 720);
 		i.src = c.toDataURL();
 		return i;
 	};
