@@ -1,6 +1,7 @@
 define(['jquery','underscore','promise'], function(jquery, underscore, promise) {
 	function JsWebcam() {
 		this.options = { video: true };
+		this.$videoContainer.append(this.video);
 	}
 
 	var userMediaKey = _.detect(['getUserMedia','webkitGetUserMedia','mozGetUserMedia','msGetUserMedia'], function(key) {
@@ -15,6 +16,7 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 		video: document.createElement('video'),
 		stream: null,
+		type: 'js',
 		
 		setDimensions: function(width, height) {
 			this.video.width = width;
@@ -55,6 +57,14 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			this.canvas.getContext('2d').drawImage(this.video, 0, 0);
 			img.src = this.canvas.toDataURL('image/png');
 			return img;
+		},
+
+		pause: function() {
+			this.video.pause();
+		},
+
+		play: function() {
+			this.video.play();
 		},
 
 		takePicture: function(df) {

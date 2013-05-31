@@ -1,12 +1,10 @@
 define(['jquery','underscore','promise'], function(jquery, underscore, promise) {
 
 	function IosWebcam() {
-		this.ios.$container = $(document.createElement('form')).attr({
-			id: 'webcam-ios-container'
-		}).addClass('visibility--invisible').appendTo(this.$container.children().first());;
+		this.$container.addClass('webcam--ios');
 		this.ios.$input = $('<input id="webcam-input" type="file" accept="image/*;capture=camera">')
 			.on('change', _.bind(this.onPictureUpload, this))
-			.appendTo(this.ios.$container);
+			.appendTo(this.$container);
 	}
 
 	IosWebcam.prototype.ios = {
@@ -15,16 +13,16 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 		}
 	};
 
+	IosWebcam.prototype.type = 'ios';
+
 	IosWebcam.prototype.setDimensions = function(width, height) {
 	};
 
 	IosWebcam.prototype.requestWebcam = function(df) {
 		this.ios.deferreds.request = df;
-		
 	};
 
 	IosWebcam.prototype.onPictureUpload = function() {
-		this.ios.$container.invisibleImmediate();
 		this.ios.deferreds.request.resolve();
 	};
 
@@ -62,6 +60,12 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			img.src = e.target.result;
 		};
 		reader.readAsDataURL(this.ios.$input[0].files[0]);
+	};
+
+	IosWebcam.prototype.screenshot = function() {
+		var df = promise.defer();
+		this.takePicture(df);
+		return df.promise;
 	};
 
 	return IosWebcam;

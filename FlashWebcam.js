@@ -1,10 +1,8 @@
 define(['jquery','underscore','promise','getUserMedia'], function(jquery, underscore, promise, getUserMedia) {
 
 	function FlashWebcam() {
-		this.flash.$container = $(document.createElement('div')).attr({
-			id: 'webcam-flash-container'
-		}).addClass('invisible')
-			.prependTo(this.$container.children().first().css('overflow','hidden'));
+		this.$container.addClass('webcam--flash');
+		this.$videoContainer.attr('id', 'flash-video-container');
 		this.options = {
 			width: this.$container.width(),
 			height: this.$container.height(),
@@ -14,11 +12,13 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 			debug: _.bind(this.onFlashInfo, this),
 			onCapture: _.bind(this.onFlashCapture, this),
 			onSave: _.bind(this.onCaputreStream, this),
-			el: this.flash.$container.attr('id'),
+			el: this.$videoContainer.attr('id'),
 			append: true,
 			context: 'flash' // webrtc for js. filled by shim
 		};
 	}
+
+	FlashWebcam.prototype.type = 'flash';
 
 	FlashWebcam.prototype.flash = {
 		$container: null,
@@ -39,25 +39,35 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 		window.webcam = this.options;
 		df.promise.then(_.bind(function() { 
 			window.webcam = this.options;
-			this.flash.html = this.flash.$container.html();
+			this.flash.html = this.$videoContainer.html();
 		}, this));
 		if (('getCameraList' in webcam) && webcam.getCameraList()) {
-			this.flash.$container.html(this.flash.html);
+			this.$videoContainer.html(this.flash.html);
 		}
 		else {
 			window.getUserMedia(this.options);
 		}
-		this.flash.$container.removeClass('invisible');
+	};
+
+	FlashWebcam.prototype.play = function() {
+	};
+
+	FlashWebcam.prototype.pause = function() {
 	};
 
 	FlashWebcam.prototype.stop = function() {
-		this.flash.$container.empty().addClass('invisible');
+		this.$videoContainer.empty().invisible().addClass('hidden');
 	};
 
 	FlashWebcam.prototype.takePicture = function(df) {
-		this.flash.$container.addClass('invisible');
 		this.flash.deferreds.screenshot = df;
 		setTimeout(function() { window.webcam.capture(); }, 2000);
+	};
+
+	FlashWebcam.prototype.screenshot = function() {
+		this.flash.deferreds.screenshot = promise.defer();
+		window.webcam.capture();
+		return this.flash.deferreds.screenshot.promise;
 	};
 
 	FlashWebcam.prototype.onFlashInfo = function(type, value) {
