@@ -37,16 +37,12 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 	FlashWebcam.prototype.requestWebcam = function(df) {
 		this.flash.deferreds.request = df;
 		window.webcam = this.options;
+		this.$videoContainer.visibleImmediate().removeClass('hidden');
 		df.promise.then(_.bind(function() { 
 			window.webcam = this.options;
 			this.flash.html = this.$videoContainer.html();
 		}, this));
-		if (('getCameraList' in webcam) && webcam.getCameraList()) {
-			this.$videoContainer.html(this.flash.html);
-		}
-		else {
-			window.getUserMedia(this.options);
-		}
+		window.getUserMedia(this.options);
 	};
 
 	FlashWebcam.prototype.play = function() {
@@ -56,7 +52,7 @@ define(['jquery','underscore','promise','getUserMedia'], function(jquery, unders
 	};
 
 	FlashWebcam.prototype.stop = function() {
-		this.$videoContainer.empty().invisible().addClass('hidden');
+		this.$videoContainer.empty();
 	};
 
 	FlashWebcam.prototype.takePicture = function(df) {
