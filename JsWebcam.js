@@ -52,8 +52,8 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 
 		screenshot: function() {
 			var img = new Image();
-			this.canvas.width = this.video.width;
-			this.canvas.height = this.video.height;
+			this.canvas.width = this.video.videoWidth;
+			this.canvas.height = this.video.videoHeight;
 			this.canvas.getContext('2d').drawImage(this.video, 0, 0);
 			img.src = this.canvas.toDataURL('image/png');
 			return img;
