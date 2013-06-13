@@ -50,11 +50,27 @@ define(['jquery','underscore','promise'], function(jquery, underscore, promise) 
 			}
 		},
 
-		screenshot: function() {
-			var img = new Image();
-			this.canvas.width = this.video.videoWidth;
-			this.canvas.height = this.video.videoHeight;
-			this.canvas.getContext('2d').drawImage(this.video, 0, 0);
+		screenshot: function(ratio) {
+			var img = new Image(),
+				r = arguments.length < 1 ? 1 : ratio,
+				w = this.video.videoWidth * r,
+				h = this.video.videoHeight * r;
+			if (r <= 0 || r > 1) {
+				throw new RangeError("Invalid ratio.");
+			}
+			this.canvas.width = w;
+			this.canvas.height = h;
+			this.canvas.getContext('2d').drawImage(
+				this.video,
+				(this.video.videoWidth - w) / 2,
+				(this.video.videoHeight - h) / 2,
+				w,
+				h,
+				0,
+				0,
+				w,
+				h
+			);
 			img.src = this.canvas.toDataURL('image/png');
 			return img;
 		},
